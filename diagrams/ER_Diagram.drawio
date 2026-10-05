@@ -31,6 +31,7 @@
         <mxCell id="e_job_application" value="1 : M" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" edge="1" parent="1" source="job" target="application"><mxGeometry relative="1" as="geometry"/></mxCell>
         <mxCell id="e_application_interview" value="1 : 0..M" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" edge="1" parent="1" source="application" target="interview"><mxGeometry relative="1" as="geometry"/></mxCell>
         <mxCell id="e_application_offer" value="1 : 0..1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" edge="1" parent="1" source="application" target="offer"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er_diagram_reference_image" value="ER Diagram Reference Image" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;aspect=fixed;image=Campus_Career_Internship_ER_Diagram_Clean%20(1).drawio.png;" vertex="1" parent="1"><mxGeometry x="40" y="930" width="720" height="450" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>
