@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <div class="page-header"><div><span class="eyebrow">APPLICATION HUB</span><h1>Applications</h1><p>Track every candidate journey from application to outcome.</p></div></div>
+    <div class="row g-3 mb-4">{% for key, label, color in [('total', 'Total Applications', 'blue'), ('Applied', 'Applied', 'blue'), ('Shortlisted', 'Shortlisted', 'orange'), ('Selected', 'Selected', 'green'), ('Rejected', 'Rejected', 'red')] %}<div class="col-6 col-lg"><div class="mini-stat {{ color }}"><small>{{ label }}</small><strong>{{ total if key == 'total' else summary.get(key, 0) }}</strong></div></div>{% endfor %}</div>
+    <div class="toolbar"><div class="search-box"><i class="bi bi-search"></i><input type="search" data-table-search="#applicationTable" placeholder="Search by student, job or company..."></div></div>
+    <div class="content-card table-responsive"><table class="table align-middle mb-0" id="applicationTable"><thead><tr><th>ID</th><th>Student</th><th>Opportunity</th><th>Company</th><th>Applied on</th><th>Status</th><th></th></tr></thead><tbody>{% for application in applications %}<tr><td class="muted">#{{ application.Application_ID }}</td><td><strong>{{ application.Student_Name }}</strong></td><td>{{ application.Job_Title }}</td><td>{{ application.Company_Name }}</td><td>{{ application.Application_Date }}</td><td><span class="status status-{{ application.Status|lower }}">{{ application.Status }}</span></td><td><a href="{{ url_for('application_detail', application_id=application.Application_ID) }}" class="btn btn-sm btn-light rounded-pill">View Details <i class="bi bi-arrow-up-right"></i></a></td></tr>{% else %}<tr><td colspan="7" class="empty-state">No applications found.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

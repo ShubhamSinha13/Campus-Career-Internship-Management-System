@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{% if interview %}Edit Interview{% else %}Schedule Interview{% endif %}{% endblock %}
+{% block content %}
+<div class="container page-content"><div class="auth-card content-card wide-auth">
+    <span class="eyebrow">COMPANY TOOLS</span>
+    <h1>{% if interview %}Edit interview{% else %}Schedule interview{% endif %}</h1>
+    <p class="muted">{{ application.Student_Name }} · {{ application.Job_Title }}</p>
+    <form method="post" class="row g-3">
+        <div class="col-md-6"><label class="form-label">Interview date</label><input class="form-control" type="date" name="interview_date" value="{{ interview.Interview_Date if interview else '' }}" required></div>
+        <div class="col-md-6"><label class="form-label">Interview time</label><input class="form-control" type="time" name="interview_time" value="{{ interview.Interview_Time if interview else '' }}" required></div>
+        <div class="col-md-6"><label class="form-label">Mode</label><select class="form-select" name="mode" required>{% for mode in interview_modes %}<option {% if interview and interview.Mode == mode %}selected{% endif %}>{{ mode }}</option>{% endfor %}</select></div>
+        <div class="col-md-6"><label class="form-label">Status</label><select class="form-select" name="interview_status" required>{% for status in interview_statuses %}<option {% if interview and interview.Interview_Status == status %}selected{% endif %}>{{ status }}</option>{% endfor %}</select></div>
+        <div class="col-12"><label class="form-label">Remarks</label><textarea class="form-control" name="remarks" maxlength="500" rows="4">{{ interview.Remarks if interview else '' }}</textarea></div>
+        <div class="col-12"><button class="btn btn-primary">{% if interview %}Save Interview{% else %}Schedule Interview{% endif %}</button><a class="btn btn-light ms-2" href="{{ url_for('company_applicants') }}">Cancel</a></div>
+    </form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-copy">
+            <span class="project-badge"><i class="bi bi-stars me-1"></i> DBMS Project · Phase 2</span>
+            <h1>Campus Career &amp; Internship<br><span>Management System</span></h1>
+            <p>Centralized internship and career opportunity management portal.</p>
+        </div>
+    </div>
+</section>
+<div class="container page-content">
+    <div class="row g-3 mb-5">
+        {% set cards = [
+            ('students', 'Total Students', 'Registered candidates', 'bi-people-fill', 'blue'),
+            ('companies', 'Total Companies', 'Recruiting organizations', 'bi-buildings-fill', 'purple'),
+            ('open_jobs', 'Open Opportunities', 'Currently available', 'bi-briefcase-fill', 'green'),
+            ('applications', 'Applications', 'Total applications', 'bi-file-earmark-text-fill', 'orange'),
+            ('interviews', 'Interviews', 'Scheduled or completed', 'bi-calendar2-check-fill', 'teal'),
+            ('offers', 'Offers', 'Offers generated', 'bi-award-fill', 'pink')
+        ] %}
+        {% for key, label, hint, icon, color in cards %}
+        <div class="col-6 col-xl-2">
+            <div class="stat-card {{ color }}">
+                <div class="stat-icon"><i class="bi {{ icon }}"></i></div>
+                <div class="stat-value">{{ stats[key] }}</div>
+                <div class="stat-label">{{ label }}</div>
+                <div class="stat-hint">{{ hint }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="section-heading"><div><span class="eyebrow">EXPLORE</span><h2>Quick Access</h2></div></div>
+    <div class="row g-3 mb-5">
+        {% for url, icon, title, text in [
+            ('jobs', 'bi-arrow-up-right', 'Browse Internships', 'Discover current opportunities'),
+            ('students', 'bi-person-vcard', 'View Students', 'Explore candidate profiles'),
+            ('companies', 'bi-building', 'Explore Companies', 'Meet recruiting partners'),
+            ('applications', 'bi-clipboard-data', 'Track Applications', 'Follow application progress')
+        ] %}
+        <div class="col-md-6 col-xl-3"><a class="quick-card" href="{{ url_for(url) }}"><span class="quick-icon"><i class="bi {{ icon }}"></i></span><span><strong>{{ title }}</strong><small>{{ text }}</small></span><i class="bi bi-chevron-right ms-auto"></i></a></div>
+        {% endfor %}
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="section-heading"><div><span class="eyebrow">OPPORTUNITIES</span><h2>Recent Opportunities</h2></div><a href="{{ url_for('jobs') }}" class="text-link">View all <i class="bi bi-arrow-right"></i></a></div>
+            <div class="content-card table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>Opportunity</th><th>Company</th><th>Location</th><th>Deadline</th><th>Status</th></tr></thead>
+                    <tbody>{% for job in jobs %}<tr><td><a class="table-title" href="{{ url_for('job_detail', job_id=job.Job_ID) }}">{{ job.Job_Title }}</a><small class="d-block muted">{{ job.Job_Type }}</small></td><td>{{ job.Company_Name }}</td><td>{{ job.Location }}</td><td>{{ job.Application_Deadline }}</td><td><span class="status status-{{ job.Status|lower }}">{{ job.Status }}</span></td></tr>{% else %}<tr><td colspan="5" class="empty-state">No opportunities found.</td></tr>{% endfor %}</tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="section-heading"><div><span class="eyebrow">ACTIVITY</span><h2>Recent Applications</h2></div><a href="{{ url_for('applications') }}" class="text-link">View all <i class="bi bi-arrow-right"></i></a></div>
+            <div class="content-card">{% for application in applications %}<div class="activity-row"><div class="avatar">{{ application.Student_Name[:1] }}</div><div class="flex-grow-1"><strong>{{ application.Student_Name }}</strong><small>{{ application.Job_Title }} · {{ application.Application_Date }}</small></div><span class="status status-{{ application.Status|lower }}">{{ application.Status }}</span></div>{% else %}<div class="empty-state">No applications found.</div>{% endfor %}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

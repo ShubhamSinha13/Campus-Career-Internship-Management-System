@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block content %}
+<div class="container page-content"><div class="auth-card content-card wide-auth">
+    <div class="d-flex justify-content-between align-items-start"><div><span class="eyebrow">STUDENT PROFILE</span><h1>Edit Profile</h1><p class="muted">Update your academic and contact information.</p></div><a class="back-link" href="{{ url_for('student_dashboard') }}">Back to dashboard</a></div>
+    <form method="post" class="row g-3 mt-1">
+        <div class="col-md-6"><label class="form-label">Name</label><input class="form-control" name="name" value="{{ student.Name }}" required></div>
+        <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="{{ student.Email }}" required></div>
+        <div class="col-md-6"><label class="form-label">Phone</label><input class="form-control" name="phone" value="{{ student.Phone or '' }}" maxlength="20"></div>
+        <div class="col-md-6"><label class="form-label">Date of Birth</label><input class="form-control" type="date" name="dob" value="{{ student.DOB }}" required></div>
+        <div class="col-md-4"><label class="form-label">CGPA</label><input class="form-control" type="number" name="cgpa" min="0" max="10" step=".01" value="{{ student.CGPA }}" required></div>
+        <div class="col-md-4"><label class="form-label">Department</label><select class="form-select" name="department_id" required>{% for department in departments %}<option value="{{ department.Department_ID }}" {% if department.Department_ID == student.Department_ID %}selected{% endif %}>{{ department.Department_Name }}</option>{% endfor %}</select></div>
+        <div class="col-md-4"><label class="form-label">Graduation Year</label><input class="form-control" type="number" name="graduation_year" min="1900" max="2200" value="{{ student.Graduation_Year }}" required></div>
+        <div class="col-12"><button class="btn btn-primary">Save Changes</button></div>
+    </form>
+</div></div>
+{% endblock %}

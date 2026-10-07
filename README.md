@@ -1,159 +1,139 @@
 # Campus Career & Internship Management System
 
-## Current Status
-
-**Assessment 8 / Phase 1**
-
-This repository currently contains only the database design and DDL work for the DBMS academic project. Later assessments will add sample DML, query collections, Flask, Python, frontend, business logic, and database connectivity.
-
-### Completed in Assessment 8
-
-- Problem identification
-- Requirements analysis
-- Database design
-- ER diagram
-- ER-to-relational model
-- Normalization: 1NF, 2NF, and 3NF
-- DDL / table creation
-
-### Not Implemented Yet
-
-- DML / sample data
-- SQL query collection
-- Flask backend
-- Frontend
-- Business logic
-- Database connectivity
-- Application testing
-
-## Problem Statement
-
-Students often need one organized system to maintain their academic profile, skills, certifications, and internship applications. Companies and recruiters also need a structured way to publish jobs, review applications, conduct interviews, and record offers. This project models these activities in a relational database.
+A Flask and MySQL DBMS application for managing student profiles, skills, certifications, internship opportunities, applications, interviews, and offers.
 
 ## Objectives
 
-- Store student, department, skill, and certification information.
-- Store companies, recruiters, and job opportunities.
-- Connect students with skills and jobs through normalized junction tables.
-- Track applications, interviews, and offers.
-- Demonstrate relational database design, normalization, DDL, keys, and constraints.
+- Maintain student academic profiles, skills, certifications, and applications.
+- Allow companies to manage profiles, jobs, required skills, applicants, interviews, and offers.
+- Provide eligibility checking using CGPA and required skills.
+- Demonstrate normalized relational design, constraints, transactions, authentication, and role-based access.
 
-## Scope
+## Technology stack
 
-Assessment 8 is limited to problem identification, requirements, the ER design, the relational model, normalization documentation, and MySQL table creation. Sample DML, SQL queries, Flask, Python, frontend, business logic, connectivity, authentication, dashboards, and testing are intentionally deferred to later project phases. Admin is treated as a system role and is not a database entity. Eligibility is represented using `Minimum_CGPA` and `JOB_SKILL`; no separate eligibility table is used.
+- Python 3.12+
+- Flask
+- MySQL 8+
+- `mysql-connector-python`
+- Bootstrap, HTML, CSS, and JavaScript
 
-## Phase 1 Database Design
+## Architecture
 
-- Twelve relational tables representing students, departments, skills, certifications, companies, recruiters, jobs, applications, interviews, and offers.
-- Primary keys, foreign keys, composite keys, unique constraints, and referential actions.
-- A unique `(Student_ID, Job_ID)` constraint to prevent duplicate applications.
-- A unique `Application_ID` in `OFFER` to enforce the `APPLICATION 1 : 0..1 OFFER` relationship.
+- `database/`: MySQL database, schema, sample data, authentication-table, and query scripts.
+- `app/app.py`: Flask routes, validation, authentication, authorization, and business workflows.
+- `app/db.py`: environment-based MySQL connection helper.
+- `app/templates/`: Jinja templates.
+- `app/static/`: CSS and JavaScript assets.
+- `diagrams/`: ER diagrams.
+- `docs/`: database design documentation.
 
-## Technology Stack
+## Database
 
-- MySQL
-- MySQL Workbench
-- Python and Flask planned for a later phase
-- HTML, CSS, JavaScript, and Bootstrap planned for a later phase
-- `mysql-connector-python` planned for a later phase
-- Git and GitHub for version control
+The approved Phase 1 schema contains:
 
-## Database Entities
+`DEPARTMENT`, `STUDENT`, `SKILL`, `STUDENT_SKILL`, `CERTIFICATION`, `COMPANY`, `RECRUITER`, `JOB`, `JOB_SKILL`, `APPLICATION`, `INTERVIEW`, and `OFFER`.
 
-The design contains exactly these 12 tables:
+Phase 2 adds `USER_ACCOUNT` for authentication. The scripts are intended to be reviewed and executed manually in MySQL Workbench; the Flask application does not create or alter the schema automatically.
 
-1. `DEPARTMENT(Department_ID, Department_Name)`
-2. `STUDENT(Student_ID, Name, Email, Phone, DOB, CGPA, Graduation_Year, Department_ID)`
-3. `SKILL(Skill_ID, Skill_Name)`
-4. `STUDENT_SKILL(Student_ID, Skill_ID, Proficiency)`
-5. `CERTIFICATION(Certification_ID, Student_ID, Certification_Name, Issuing_Organization, Issue_Date, Expiry_Date)`
-6. `COMPANY(Company_ID, Company_Name, Industry, Location, Website, Email, Phone)`
-7. `RECRUITER(Recruiter_ID, Company_ID, Recruiter_Name, Email, Phone)`
-8. `JOB(Job_ID, Company_ID, Recruiter_ID, Job_Title, Job_Type, Description, Location, Minimum_CGPA, Application_Deadline, Salary, Status)`
-9. `JOB_SKILL(Job_ID, Skill_ID)`
-10. `APPLICATION(Application_ID, Student_ID, Job_ID, Application_Date, Status)`
-11. `INTERVIEW(Interview_ID, Application_ID, Interview_Date, Interview_Time, Mode, Interview_Status, Remarks)`
-12. `OFFER(Offer_ID, Application_ID, Offer_Date, Job_Title, Salary, Joining_Date, Offer_Status)`
+## Main features
 
-`STUDENT_SKILL` and `JOB_SKILL` use composite primary keys. `APPLICATION` has a unique constraint on `(Student_ID, Job_ID)`, so a student cannot apply to the same job more than once. `OFFER.Application_ID` is unique to enforce the one-to-zero-or-one offer relationship.
+- Student registration and login.
+- Company registration and login.
+- Admin, student, and company role-based dashboards.
+- Student profile, skill, and certification self-service.
+- Company profile and job self-service.
+- Job browsing and eligibility checking.
+- Application submission and status tracking.
+- Company interview scheduling, editing, and cancellation.
+- Company offer creation, editing, and historical withdrawal.
+- Application, interview, and offer detail views.
+- Parameterized SQL and transactional multi-table updates.
 
-## Database Relationships
+## Roles
 
-- `DEPARTMENT` 1 : M `STUDENT`
-- `STUDENT` 1 : M `CERTIFICATION`
-- `STUDENT` M : N `SKILL`, resolved through `STUDENT_SKILL`
-- `COMPANY` 1 : M `RECRUITER`
-- `COMPANY` 1 : M `JOB`
-- `RECRUITER` 1 : M `JOB`
-- `JOB` M : N `SKILL`, resolved through `JOB_SKILL`
-- `STUDENT` M : N `JOB`, resolved through `APPLICATION`
-- `APPLICATION` 1 : 0..M `INTERVIEW`
-- `APPLICATION` 1 : 0..1 `OFFER`
+### Student
 
-## Normalization Summary
+Students can manage their own profile, skills, and certifications; browse jobs; check eligibility; apply; and view only their own applications, interviews, and offers.
 
-### First Normal Form (1NF)
+### Company
 
-All attributes contain atomic values. Multivalued student skills and job skills are separated into `STUDENT_SKILL` and `JOB_SKILL` rather than being stored as repeated values in one column.
+Companies can manage their own profile and jobs, required job skills, applicants, application statuses, interviews, and offers. Ownership is checked through the authenticated `USER_ACCOUNT.Company_ID`.
 
-### Second Normal Form (2NF)
+### Admin
 
-Relations with composite keys have no partial dependencies. The `Proficiency` attribute in `STUDENT_SKILL` depends on the complete `(Student_ID, Skill_ID)` key, while `JOB_SKILL` contains only its complete composite key.
+Admins can access the administrative dashboard and existing system-wide monitoring views. There is no public admin-registration workflow.
 
-### Third Normal Form (3NF)
+## Setup
 
-Transitive dependencies are removed by separating entities such as `DEPARTMENT`, `COMPANY`, `STUDENT`, `RECRUITER`, and `JOB`. Non-key attributes describe the key of their own relation rather than another non-key attribute.
+Create and activate a Python virtual environment, then install dependencies:
 
-## Project Structure
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Copy `.env.example` to `.env` and provide local values. `.env` is ignored by Git and must never be committed:
 
 ```text
-Campus-Career-Internship-Management-System/
-├── README.md
-├── .gitignore
-├── database/
-│   ├── 01_create_database.sql
-│   ├── 02_create_tables.sql
-│   ├── 03_insert_sample_data.sql       # Later phase; not in Assessment 8 commit
-│   └── 04_queries.sql                  # Later phase; not in Assessment 8 commit
-├── diagrams/
-│   └── ER_Diagram.drawio
-└── docs/
-    └── Phase_1/
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=campus_career_db
+DEMO_ADMIN_PASSWORD=
+DEMO_STUDENT_PASSWORD=
+DEMO_COMPANY_PASSWORD=
+FLASK_SECRET_KEY=
 ```
 
-## How to Run the Phase 1 DDL in MySQL Workbench
+The application defaults to `localhost`, `root`, and `campus_career_db` when corresponding database variables are absent. Set `DB_PASSWORD` and a strong `FLASK_SECRET_KEY` through the environment for real use.
 
-1. Open MySQL Workbench and connect to your local MySQL server.
-2. Open `database/01_create_database.sql` and execute it.
-3. Open and execute `database/02_create_tables.sql`.
-4. Refresh the Schemas panel and inspect the `campus_career_db` tables, columns, indexes, and foreign keys.
+## Database preparation
 
-The scripts target MySQL 8.0 or later. No passwords, API keys, or database credentials are stored in this repository.
+Review the SQL scripts in order and execute them manually in MySQL Workbench:
 
-## Assessment 8 Commit Scope
+1. `database/01_create_database.sql`
+2. `database/02_create_tables.sql`
+3. `database/03_insert_sample_data.sql`
+4. `database/05_create_user_account.sql`
 
-The Assessment 8 commit contains only the database design and DDL artifacts:
+`database/04_queries.sql` contains read-only demonstrations and commented maintenance examples. Do not run scripts against a production database without reviewing them first.
 
-- `README.md`
-- `.gitignore`
-- `database/01_create_database.sql`
-- `database/02_create_tables.sql`
-- `diagrams/ER_Diagram.drawio`
-- `docs/Phase_1/Phase_1_Database_Design.md`
+## Demo accounts
 
-The existing `database/03_insert_sample_data.sql` and `database/04_queries.sql` files are intentionally excluded from this commit and are not deleted.
+Set these environment variables locally before running the controlled demo-account setup:
 
-## Git Preparation
+- `DEMO_ADMIN_PASSWORD`
+- `DEMO_STUDENT_PASSWORD`
+- `DEMO_COMPANY_PASSWORD`
 
-Review the files before committing. Use an explicit file list so later-phase files are not staged:
+Then run:
 
-```bash
-git status
-git add README.md .gitignore database/01_create_database.sql database/02_create_tables.sql diagrams/ER_Diagram.drawio docs/Phase_1/Phase_1_Database_Design.md
-git commit -m "Complete Assessment 8 Phase 1 database design and DDL"
-git remote add origin https://github.com/ShubhamSinha13/Campus-Career-Internship-Management-System.git
-git branch -M main
-git push -u origin main
+```powershell
+.\venv\Scripts\python.exe app\create_demo_accounts.py
 ```
 
-Do not run the remote or push commands until the GitHub repository exists and is accessible.
+The script hashes passwords with Werkzeug, does not print them, and does not write plaintext passwords to files. Never place real password values in source code, documentation, `.env.example`, or Git.
+
+## Run Flask
+
+From the repository root:
+
+```powershell
+$env:FLASK_APP = "app/app.py"
+.\venv\Scripts\python.exe -m flask run
+```
+
+Open the local URL shown by Flask in a browser.
+
+## Repository safety
+
+Before committing, review:
+
+```powershell
+git status --short
+git diff --check
+git diff --stat
+```
+
+Do not stage `.env`, virtual environments, caches, local database files, logs, or credentials. Use an explicit `git add` file list after reviewing the status; never commit or push secrets.

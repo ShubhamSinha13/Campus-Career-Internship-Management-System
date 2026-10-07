@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{% if offer %}Edit Offer{% else %}Issue Offer{% endif %}{% endblock %}
+{% block content %}
+<div class="container page-content"><div class="auth-card content-card wide-auth">
+    <span class="eyebrow">COMPANY TOOLS</span>
+    <h1>{% if offer %}Edit offer{% else %}Issue offer{% endif %}</h1>
+    <p class="muted">{{ application.Student_Name }} · {{ application.Job_Title }}</p>
+    <form method="post" class="row g-3">
+        <div class="col-md-6"><label class="form-label">Offer date</label><input class="form-control" type="date" name="offer_date" value="{{ offer.Offer_Date if offer else '' }}" required></div>
+        <div class="col-md-6"><label class="form-label">Joining date</label><input class="form-control" type="date" name="joining_date" value="{{ offer.Joining_Date if offer else '' }}" required></div>
+        <div class="col-md-8"><label class="form-label">Job title</label><input class="form-control" name="job_title" value="{{ offer.Job_Title if offer else application.Job_Title }}" maxlength="150" required></div>
+        <div class="col-md-4"><label class="form-label">Salary</label><input class="form-control" type="number" name="salary" min="0" step=".01" value="{{ offer.Salary if offer else '' }}" required></div>
+        <div class="col-md-6"><label class="form-label">Offer status</label><select class="form-select" name="offer_status" required>{% for status in offer_statuses %}<option {% if offer and offer.Offer_Status == status %}selected{% endif %}>{{ status }}</option>{% endfor %}</select></div>
+        <div class="col-12"><button class="btn btn-primary">{% if offer %}Save Offer{% else %}Issue Offer{% endif %}</button><a class="btn btn-light ms-2" href="{{ url_for('company_applicants') }}">Cancel</a></div>
+    </form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <div class="page-header"><div><span class="eyebrow">RECRUITING NETWORK</span><h1>Companies</h1><p>Connect with organizations creating the next generation of careers.</p></div><div class="header-count"><strong>{{ companies|length }}</strong><span>companies</span></div></div>
+    <div class="toolbar"><div class="search-box"><i class="bi bi-search"></i><input type="search" data-company-search=".company-result" placeholder="Search by company, industry or location..."></div></div>
+    <div class="row g-4">{% for company in companies %}<div class="col-md-6 company-result" data-search="{{ company.Company_Name }} {{ company.Industry }} {{ company.Location }}"><div class="company-card content-card"><div class="d-flex align-items-start gap-3"><span class="company-mark large">{{ company.Company_Name[:1] }}</span><div class="flex-grow-1"><h3>{{ company.Company_Name }}</h3><p>{{ company.Industry }} · {{ company.Location }}</p></div></div><div class="company-stats"><span><strong>{{ company.Opportunity_Count }}</strong><small>Opportunities</small></span><span><strong>{{ company.Recruiter_Count }}</strong><small>Recruiters</small></span></div><div class="company-contact"><span><i class="bi bi-envelope me-2"></i>{{ company.Email or 'No email listed' }}</span>{% if company.Website %}<a href="{{ company.Website }}" target="_blank" rel="noopener">Visit website <i class="bi bi-box-arrow-up-right"></i></a>{% endif %}</div></div></div>{% else %}<div class="empty-state">No companies found.</div>{% endfor %}</div>
+</div>
+{% endblock %}

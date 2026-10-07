@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Application #{{ application.Application_ID }}{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <a href="{{ url_for('applications') }}" class="back-link"><i class="bi bi-arrow-left"></i> Back to applications</a>
+    <div class="profile-hero content-card mt-3">
+        <div class="profile-avatar"><i class="bi bi-file-earmark-text"></i></div>
+        <div>
+            <span class="eyebrow">APPLICATION #{{ application.Application_ID }}</span>
+            <h1>{{ application.Student_Name }}</h1>
+            <p class="mb-0">{{ application.Job_Title }} · {{ application.Company_Name }}</p>
+        </div>
+        <div class="ms-auto text-end">
+            <span class="status status-{{ application.Status|lower }}">{{ application.Status }}</span>
+            <small class="d-block muted mt-2">Applied {{ application.Application_Date }}</small>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-lg-6">
+            <div class="content-card h-100">
+                <h3 class="card-title">Student information</h3>
+                <dl class="detail-list">
+                    <dt>Name</dt><dd>{{ application.Student_Name }}</dd>
+                    <dt>Email</dt><dd>{{ application.Student_Email }}</dd>
+                    <dt>Department</dt><dd>{{ application.Department_Name }}</dd>
+                    <dt>CGPA</dt><dd><span class="cgpa-badge">{{ '%.2f'|format(application.CGPA) }}</span></dd>
+                </dl>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="content-card h-100">
+                <h3 class="card-title">Opportunity information</h3>
+                <dl class="detail-list">
+                    <dt>Job</dt><dd>{{ application.Job_Title }}</dd>
+                    <dt>Company</dt><dd>{{ application.Company_Name }}</dd>
+                    <dt>Recruiter</dt><dd>{{ application.Recruiter_Name }}</dd>
+                    <dt>Job type and location</dt><dd>{{ application.Job_Type }} · {{ application.Location }}</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="content-card">
+                <h3 class="card-title">Application timeline</h3>
+                <div class="timeline">
+                    <div class="timeline-item complete"><span class="timeline-dot"><i class="bi bi-check"></i></span><div><strong>Application Submitted</strong><small>{{ application.Application_Date }}</small></div></div>
+                    <div class="timeline-item {% if application.Status in ['Shortlisted', 'Selected', 'Rejected'] %}complete{% endif %}"><span class="timeline-dot"><i class="bi bi-funnel"></i></span><div><strong>Shortlisted</strong><small>{% if application.Status in ['Shortlisted', 'Selected'] %}Status reached{% elif application.Status == 'Rejected' %}Not reached{% else %}Pending{% endif %}</small></div></div>
+                    <div class="timeline-item {% if interviews %}complete{% endif %}"><span class="timeline-dot"><i class="bi bi-calendar2-check"></i></span><div><strong>Interview</strong><small>{% if interviews %}{{ interviews|length }} interview record{% if interviews|length != 1 %}s{% endif %}{% else %}No interview scheduled{% endif %}</small></div></div>
+                    <div class="timeline-item {% if application.Status in ['Selected', 'Rejected'] %}complete{% endif %}"><span class="timeline-dot"><i class="bi bi-flag"></i></span><div><strong>Selected / Rejected</strong><small>{{ application.Status }}</small></div></div>
+                    <div class="timeline-item {% if offer %}complete{% endif %}"><span class="timeline-dot"><i class="bi bi-award"></i></span><div><strong>Offer</strong><small>{% if offer %}{{ offer.Offer_Status }}{% else %}No offer generated{% endif %}</small></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="content-card h-100">
+                <h3 class="card-title">Interview information</h3>
+                {% for interview in interviews %}
+                <div class="list-item d-block"><div class="d-flex justify-content-between"><strong>{{ interview.Interview_Date }} · {{ interview.Interview_Time }}</strong><span class="status status-{{ interview.Interview_Status|lower }}">{{ interview.Interview_Status }}</span></div><small>{{ interview.Mode }} · {{ interview.Remarks or 'No remarks' }}</small>{% if current_role == 'COMPANY' %}<div class="mt-2 d-flex gap-2"><a class="btn btn-sm btn-light" href="{{ url_for('edit_interview', interview_id=interview.Interview_ID) }}">Edit Interview</a>{% if interview.Interview_Status != 'Cancelled' %}<form method="post" action="{{ url_for('cancel_interview', interview_id=interview.Interview_ID) }}"><button class="btn btn-sm btn-outline-danger">Cancel Interview</button></form>{% endif %}</div>{% endif %}</div>
+                {% else %}<div class="empty-state">No interview scheduled</div>{% endfor %}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="content-card">
+                <h3 class="card-title">Offer information</h3>
+                {% if offer %}<div class="row detail-grid"><div class="col-sm-3"><small>Offer date</small><strong>{{ offer.Offer_Date }}</strong></div><div class="col-sm-3"><small>Job title</small><strong>{{ offer.Job_Title }}</strong></div><div class="col-sm-3"><small>Salary</small><strong>₹{{ '%.2f'|format(offer.Salary) }}</strong></div><div class="col-sm-3"><small>Status</small><strong><span class="status status-{{ offer.Offer_Status|lower }}">{{ offer.Offer_Status }}</span></strong></div></div><p class="muted mt-3 mb-0">Joining date: {{ offer.Joining_Date }}</p>{% if current_role == 'COMPANY' %}<div class="mt-2 d-flex gap-2"><a class="btn btn-sm btn-light" href="{{ url_for('edit_offer', offer_id=offer.Offer_ID) }}">Edit Offer</a>{% if offer.Offer_Status != 'Withdrawn' %}<form method="post" action="{{ url_for('withdraw_offer', offer_id=offer.Offer_ID) }}"><button class="btn btn-sm btn-outline-danger">Withdraw Offer</button></form>{% endif %}</div>{% endif %}{% else %}<div class="empty-state">No offer generated</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

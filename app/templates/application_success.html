@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Application submitted{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <div class="success-panel content-card">
+        <span class="success-icon"><i class="bi bi-check-lg"></i></span>
+        <span class="eyebrow">APPLICATION RECEIVED</span>
+        <h1>Application submitted successfully.</h1>
+        <p>Your application has been recorded with status <span class="status status-applied">Applied</span>.</p>
+        <div class="success-summary"><strong>{{ result.student.Name }}</strong><span>{{ result.job.Job_Title }} · {{ result.job.Company_Name }}</span><small>Application date: {{ application_date }}</small></div>
+        <a href="{{ url_for('application_detail', application_id=application_id) }}" class="btn btn-primary rounded-pill">View Application <i class="bi bi-arrow-up-right"></i></a>
+    </div>
+</div>
+{% endblock %}

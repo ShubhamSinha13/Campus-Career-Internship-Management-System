@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ student.Name }}{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <a href="{% if current_role == 'STUDENT' %}{{ url_for('student_dashboard') }}{% else %}{{ url_for('students') }}{% endif %}" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+    <div class="profile-hero content-card mt-3"><div class="profile-avatar">{{ student.Name[:1] }}</div><div><span class="eyebrow">STUDENT PROFILE</span><h1>{{ student.Name }}</h1><p class="mb-0"><i class="bi bi-envelope me-2"></i>{{ student.Email }} <span class="mx-2">·</span> {{ student.Department_Name }}</p></div><div class="profile-score ms-auto"><strong>{{ '%.2f'|format(student.CGPA) }}</strong><span>CGPA</span>{% if current_role == 'STUDENT' %}<a class="btn btn-sm btn-light mt-2" href="{{ url_for('edit_student_profile') }}">Edit Profile</a>{% endif %}</div></div>
+    <div class="row g-4 mt-1">
+        <div class="col-lg-4"><div class="content-card h-100"><h3 class="card-title">Personal details</h3><dl class="detail-list"><dt>Phone</dt><dd>{{ student.Phone or 'Not provided' }}</dd><dt>Date of Birth</dt><dd>{{ student.DOB }}</dd><dt>Graduation Year</dt><dd>{{ student.Graduation_Year }}</dd><dt>Department</dt><dd>{{ student.Department_Name }}</dd></dl></div></div>
+        <div class="col-lg-8"><div class="content-card h-100"><h3 class="card-title">Skills</h3><div class="tag-list">{% for skill in skills %}<span class="skill-tag">{{ skill.Skill_Name }} <small>{{ skill.Proficiency }}</small></span>{% else %}<span class="muted">No skills listed.</span>{% endfor %}</div></div></div>
+        <div class="col-lg-6"><div class="content-card h-100"><h3 class="card-title">Certifications</h3>{% for certification in certifications %}<div class="list-item"><strong>{{ certification.Certification_Name }}</strong><small>{{ certification.Issuing_Organization }} · Issued {{ certification.Issue_Date }} · Expires {{ certification.Expiry_Date or 'No expiry' }}</small></div>{% else %}<div class="empty-state">No certifications listed.</div>{% endfor %}</div></div>
+        <div class="col-lg-6"><div class="content-card h-100"><h3 class="card-title">Applications</h3>{% for application in applications %}<div class="list-item"><div class="d-flex justify-content-between gap-2"><strong>#{{ application.Application_ID }} · {{ application.Job_Title }}</strong><span class="status status-{{ application.Status|lower }}">{{ application.Status }}</span></div><small>{{ application.Company_Name }} · {{ application.Application_Date }}</small></div>{% else %}<div class="empty-state">No applications found.</div>{% endfor %}</div></div>
+    </div>
+</div>
+{% endblock %}

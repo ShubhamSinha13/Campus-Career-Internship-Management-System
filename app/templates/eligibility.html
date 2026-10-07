@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Eligibility Checker{% endblock %}
+{% block content %}
+<div class="container page-content">
+    <div class="page-header">
+        <div><span class="eyebrow">BUSINESS LOGIC</span><h1>Eligibility Checker</h1><p>Check whether a student qualifies before applying for an opportunity.</p></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="content-card eligibility-form-card">
+                <h3 class="card-title">Check eligibility</h3>
+                <form method="post" action="{{ url_for('eligibility') }}">
+                    <label class="form-label" for="student_id">Student</label>
+                    <select class="form-select mb-3" id="student_id" name="student_id" required>
+                        <option value="">Select student</option>
+                        {% for student in students %}<option value="{{ student.Student_ID }}" {% if selected_student_id|int == student.Student_ID %}selected{% endif %}>{{ student.Name }} (#{{ student.Student_ID }})</option>{% endfor %}
+                    </select>
+                    <label class="form-label" for="job_id">Job / Internship</label>
+                    <select class="form-select mb-4" id="job_id" name="job_id" required>
+                        <option value="">Select opportunity</option>
+                        {% for job in jobs %}<option value="{{ job.Job_ID }}" {% if selected_job_id|int == job.Job_ID %}selected{% endif %}>{{ job.Job_Title }} · {{ job.Company_Name }}</option>{% endfor %}
+                    </select>
+                    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-shield-check me-2"></i>Check Eligibility</button>
+                </form>
+            </div>
+            <div class="content-card mt-4"><h3 class="card-title">Application lifecycle</h3><div class="lifecycle"><span>Applied</span><i class="bi bi-arrow-right"></i><span>Shortlisted</span><i class="bi bi-arrow-right"></i><span>Interview</span><i class="bi bi-arrow-right"></i><span>Selected / Rejected</span><i class="bi bi-arrow-right"></i><span>Offer</span></div></div>
+        </div>
+        <div class="col-lg-7">
+            {% if result %}
+            <div class="content-card eligibility-result {% if result.eligible_by_requirements %}eligible-result{% else %}ineligible-result{% endif %}">
+                {% if result.eligible_by_requirements and result.already_applied %}
+                <div class="result-heading"><span class="result-icon"><i class="bi bi-check-lg"></i></span><div><span class="eyebrow">DECISION</span><h2>Eligible — Already Applied</h2><p>All eligibility requirements are satisfied.</p></div></div>
+                <div class="availability-notice"><i class="bi bi-info-circle me-2"></i>You meet all eligibility requirements, but you have already applied for this opportunity.</div>
+                {% elif result.eligible_by_requirements %}
+                <div class="result-heading"><span class="result-icon"><i class="bi bi-check-lg"></i></span><div><span class="eyebrow">DECISION</span><h2>Eligible to Apply</h2><p>All eligibility requirements are satisfied.</p></div></div>
+                {% else %}
+                <div class="result-heading"><span class="result-icon"><i class="bi bi-x-lg"></i></span><div><span class="eyebrow">DECISION</span><h2>Not Eligible</h2><p>Review the reasons below before applying.</p></div></div>
+                <div class="reason-list">{% for reason in result.reasons %}<div><i class="bi bi-exclamation-circle me-2"></i>{{ reason }}</div>{% endfor %}</div>
+                {% endif %}
+                {% if result.student and result.job %}
+                <div class="eligibility-facts">
+                    <div><small>Student CGPA</small><strong>{{ '%.2f'|format(result.student.CGPA) }}</strong></div>
+                    <div><small>Required CGPA</small><strong>{{ '%.2f'|format(result.job.Minimum_CGPA) }}</strong></div>
+                    <div><small>Job status</small><span class="status status-{{ result.job.Status|lower }}">{{ result.job.Status }}</span></div>
+                    <div><small>Deadline</small><strong>{{ result.job.Application_Deadline }}</strong></div>
+                </div>
+                <h3 class="card-title mt-4">Required skills</h3>
+                <div class="tag-list">{% for skill in result.required_skills %}<span class="skill-tag">{{ skill.Skill_Name }} {% if skill.Skill_Name not in result.missing_skills %}<i class="bi bi-check-circle"></i>{% endif %}</span>{% else %}<span class="muted">No required skills listed.</span>{% endfor %}</div>
+                <h3 class="card-title mt-4">Student skills</h3>
+                <div class="tag-list">{% for skill in result.student_skills %}<span class="skill-tag">{{ skill.Skill_Name }}</span>{% else %}<span class="muted">No skills listed.</span>{% endfor %}</div>
+                {% if result.can_apply %}<form method="post" action="{{ url_for('apply_for_job', student_id=result.student.Student_ID, job_id=result.job.Job_ID) }}"><button class="btn btn-primary mt-4"><i class="bi bi-send me-2"></i>Apply Now</button></form>{% elif result.already_applied and result.duplicate %}<a class="btn btn-outline-primary mt-4" href="{{ url_for('application_detail', application_id=result.duplicate.Application_ID) }}"><i class="bi bi-file-earmark-text me-2"></i>View Existing Application</a>{% endif %}
+                {% endif %}
+            </div>
+            {% else %}<div class="empty-panel"><i class="bi bi-shield-check"></i><h1>Ready to check</h1><p>Select a student and opportunity to evaluate CGPA, skills, availability, and duplicate applications.</p></div>{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
